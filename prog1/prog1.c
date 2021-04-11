@@ -15,108 +15,144 @@ void printpoly(List coeffs, List degrees);
 int main(void) {
   struct ListObj *coeff_list1 = newList();
   struct ListObj *degree_list1 = newList();
-  char poly[100];
-  fgets(poly, sizeof(poly), stdin);
-  for (int i = 0; i < strlen(poly); i++) {
-	printf("%c", poly[i]);
-  }
-  /*bool negative = false;
-  char character;
-  int num_coeffs = 0;
-  int num_degrees = 0;
-  struct ListObj *coeff_list = newList();
-  struct ListObj *degree_list = newList();
-  while ((character = fgetc(stdin)) != EOF) {
-    if (isVar(character) && num_coeffs == 0) {
-      appendList(coeff_list, 1); // if we have read in a variable before a
-                                 // coefficient, that means the first coeff is 1
-      num_coeffs++;
-
-    } else if (isNum(character) && num_coeffs == 0) {
-      int coeff;
-      if (negative) {
-        coeff = (character - '0') * -1;
-      } else {
-        coeff = character - '0';
-      }
-      appendList(coeff_list, coeff); // if we have read in a number and there
-                                     // are no coefficients yet then this is the
-                                     // first coeff
-      num_coeffs++;
-
-    } else if (isNum(character) && num_degrees == 0 && num_coeffs == 1) {
-      int degree = character - '0';
-      appendList(degree_list, degree); // if we have read in a number and there
-                                       // is 1 coeff and no degrees then this
-                                       // is the first degree
-      num_degrees++;
-
-    } else if (isNum(character) && num_coeffs != 0 && num_degrees != 0 &&
-               num_coeffs == num_degrees) {
-      int coeff;
-      if (negative) {
-        coeff = (character - '0') * -1;
-      } else {
-        coeff = character - '0';
-      }
-      appendList(coeff_list, coeff); // if we have read in a number and there is
-                                     // an equal amount of coeffs and degrees
-                                     // then this is the next coeff
-      num_coeffs++;
-    }
-    // else if(isNum(character) && num_coeffs != 0 && num_degrees != 0 &&
-    // num_coeffs == num_degrees + 1) {
-    //  int degree = character - '0';
-    // appendList(degree_list, degree);
-    // }
-    else if (isPower(character) || isWhite(character) || isPlus(character)) {
-    } else if (isMinus(character)) {
-      negative = true;
-    }
-  }
-
-  // printf("The biggest element is at index: %d\n", max(new_list));
-  // printf("The element %d is at index %d\n", 8, find(new_list, 8));
-  // printf("element deleted: %d\n", delElement(new_list, max(new_list)));
-  printList(coeff_list);
-  printList(degree_list);
-  freeList(&coeff_list);
-  freeList(&degree_list); */
-  return 0; 
+  printpoly(coeff_list1, degree_list1);
+  freeList(&coeff_list1);
+  freeList(&degree_list1);
+  return 0;
 }
 
-void printpoly(List coeffs, List degrees) {
+void printpoly(List coeff_list, List degree_list) {
   bool negative = false;
+  bool variable = false;
+  int num_vars = 0;
   int num_coeffs = 0;
   int num_degrees = 0;
-  struct ListObj *coeff_list1 = newList();
-  struct ListObj *degree_list1 = newList();
+  int nums[5] = {0, 0, 0, 0, 0};
+  int nums_index = 0;
   char poly[100];
   fgets(poly, sizeof(poly), stdin);
+  // loops through one polynomial
   for (int i = 0; i < strlen(poly); i++) {
-	// if we have read in a variable before a coeff, that means the first coeff is 1.
-	// so we add 1 to our coeff list and update the amount of coeffs
-	if (isVar(character) && num_coeffs == 0) {
-      		appendList(coeff_list, 1);
-		num_coeffs++;
-  	}
-	// if we have read in a number and num_coeffs == 0, that means that is the first coeff
-	// so we check if there has been a negative sign read in in which case the bool negative would be true
-	// if negative is true we set coeff to the num * -1 and make negative true again
-	// if negative is false we just set coeff to the num
-	// we append coeff to our coeff list
-	// finally we update the amount of coeffs
-	else if (isNum(character) && num_coeffs == 0) {
-            int coeff;
-            if (negative) {
-                coeff = (character - '0') * -1;
-		negative = true;
-            } else {
-                coeff = character - '0';
-            }  
-            appendList(coeff_list, coeff); 
+    char character = poly[i];
+    // if we read in a variable add it to the variable count
+    if (isVar(character)) {
+	variable = true;
+	num_vars++;
+    }
+    // if we read in a minus sign, we change the bool negative to true so that
+    // the next number we read in will be converted to negative
+    if (isMinus(character)) {
+      negative = true;
+    }
+   
+    // if we have read in a number
+    // we add the number to an array where we will store all the digits of that
+    // number
+    else if (isNum(character)) {
+      // printf("%c ", character);
+      int num = character - '0'; // converts the character to an int
+      nums[nums_index] = num;    // adds the int to the number array
+      nums_index++; // updates the array index so that if there is another digit
+                    // we can put it in the array
+    }
+
+    //if we read in a variable and there is no number that has been read in
+    // right before it then the coeff is 1 or -1 so we append 1  or -1 to our coeff
+    // list and update the num_coeffs
+    else if (isVar(character) && nums[0] == 0) {
+	if (negative) {
+	    appendList(coeff_list, -1);
 	    num_coeffs++;
-        } 
+	    negative = false;
+	} else {
+            appendList(coeff_list, 1);
+            num_coeffs++;
+	}
+    }
+    // if we read in a variable and nums[0] != 0 that means that an entire
+    // coefficient has been read in so we loop through the nums array and form
+    // all the digits into a single number if there has been a negative sign
+    // read in, we multiply the coeff by -1 and make negative false again then
+    // we append the coeff to the coeff list and update the num_coeffs
+    // then we reset the nums list back to all 0's
+    else if ((isVar(character) || isWhite(character)) && nums[0] != 0) {
+      int num = nums[0];
+      // i starts at 1 because we set coeff to nums[0], i < nums_index + 1
+      // because we only want to add the numbers up until the nums_index
+      for (int i = 1; i < nums_index; i++) {
+        num = num * 10 + nums[i];
+      }
+      if (negative) {
+        num = num * -1;
+        negative = false;
+      }
+      if (num_coeffs == 0 || num_coeffs == num_degrees) {
+         appendList(coeff_list, num);
+         num_coeffs++;
+        
+      } else if (num_degrees < num_coeffs) {
+        appendList(degree_list, num);
+        num_degrees++;
+	variable = false;
+      }
+      for (int i = 0; i < 5; i++) {
+        nums[i] = 0;
+      }
+      nums_index = 0;
+    }
+    // if we read in a whitespace character and there is no number that has been
+    // read in right before it then the degree is 1 so we append 1 to our degree
+    // list and update the num_degrees
+    else if (isWhite(character) && variable == true && nums[0] == 0 && num_degrees < num_coeffs) {
+      appendList(degree_list, 1);
+      num_degrees++;
+      variable = false;
+    }
+    // if we read in a whitespace character and num_coeff > num_degrees, that
+    // means the last term was a constant which means that the degree was 0, we
+    // need to append 0 to our degree list and update the num_degrees in order
+    // to keep our lists consistent
+    else if (isWhite(character) && variable == false && num_coeffs > num_degrees) {
+      appendList(degree_list, 0);
+      num_degrees++;
+      variable = false;
+    }
+  }
+  // to check for numbers at the end of the polynomial, we check if there are
+  // numbers in the num array and if there are we figure out if they represent a
+  // constant or a degree
+  if (nums[0] != 0) {
+    int num = nums[0];
+    for (int i = 1; i < nums_index; i++) {
+      num = num * 10 + nums[i];
+    }
+    if (negative) {
+      num = num * -1;
+      negative = false;
+    }
+    if (num_coeffs == 0 || num_coeffs == num_degrees) {
+      appendList(coeff_list, num);
+      num_coeffs++;
+      appendList(degree_list, 0); // if its a constant, that means the degree is 0
+      num_degrees++;
+      variable = false;
+    } else if (num_degrees < num_coeffs) {
+      appendList(degree_list, num);
+      num_degrees++;
+      variable = false;
+    }
+    for (int i = 0; i < 5; i++) {
+      nums[i] = 0;
+    }
+    nums_index = 0;
+  } else if (num_degrees < num_coeffs) {
+    appendList(degree_list, 1);
+    num_degrees++;
+    variable = false;
+  }
+  printList(coeff_list);
+  printList(degree_list);
+}
 
 bool isVar(char c) { return (c >= 97 && c <= 122); }
 
