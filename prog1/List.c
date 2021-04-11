@@ -53,15 +53,20 @@ void freeList(List *pL) {
 int length(List L) { return L->length; }
 
 int max(List L) {
-  int biggest = 0;
-  Node *curr_node = L->head;
-  while (curr_node != NULL) {
-    if (curr_node->data > biggest) {
-      biggest = curr_node->data;
+  if (L->length == 0 || L == NULL) {
+    fprintf(stderr, "L is empty or does not exist.");
+    return -1;
+  } else {
+    int biggest = 0;
+    Node *curr_node = L->head;
+    while (curr_node != NULL) {
+      if (curr_node->data > biggest) {
+        biggest = curr_node->data;
+      }
+      curr_node = curr_node->next;
     }
-    curr_node = curr_node->next;
+    return find(L, biggest);
   }
-  return biggest;
 }
 
 int find(List L, int i) {
