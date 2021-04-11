@@ -109,20 +109,19 @@ int delElement(List L, int i) {
   // if node is the head node
   if (i == 0) {
     Node *curr_node = L->head; // set a node* to the head of the linked list
-    Node *next_node =
-        L->head->next;   // set a node* to the head->next of the linked list
+    Node *next_node = L->head->next;   // set a node* to the head->next of the linked list
     L->head = next_node; // set the head of the linked list to the head->next of
                          // the linked list
     int data = curr_node->data;
     free(curr_node); // free the memory of the previous head node
+    L->length -= 1;
     return data;
   }
 
   // if node is the end node
   else if (i == L->length - 1) {
     Node *curr_node = L->head; // set a node* to the head of the linked list
-    Node *next_node =
-        L->head->next; // set a node* to the head->next of the linked list
+    Node *next_node = L->head->next; // set a node* to the head->next of the linked list
     while (next_node->next != NULL) {
       curr_node = curr_node->next; // set curr node to the next node
       next_node = next_node->next; // set next node to the next node
@@ -130,27 +129,25 @@ int delElement(List L, int i) {
     curr_node->next = NULL; // set the second last node's next to NULL
     int data = next_node->data;
     free(next_node); // delete the last node
+    L->length -= 1;
     return data;
   }
 
   // if node is in the middle
   else {
     Node *curr_node = L->head; // set a node* to the head of the linked list
-    Node *next_node =
-        L->head->next; // set a node* to the head->next of the linked list
-    for (int node = 0; node < L->length; node++) {
-      if (node == i - 1) { // because we want to delete the node when next_node
-                           // is at index i not when curr_node is at index i
-        curr_node->next =
-            next_node->next; // set the curr_node's next to next_node's next
-        int data =
-            next_node->data; // save the data of the node we are going to delete
-        free(next_node);     // delete the node
-        return data;
-      }
-      curr_node = curr_node->next;
-      next_node = next_node->next;
+    Node *next_node = L->head->next; // set a node* to the head->next of the linked list
+    int node_counter = 1;
+    while (node_counter < i) {
+	next_node = next_node->next;
+	curr_node = curr_node->next;
+	node_counter++;
     }
+    curr_node->next = next_node->next;
+    int data = next_node->data;
+    free(next_node);
+    L->length -= 1;
+    return data;
   }
   return 1;
 }

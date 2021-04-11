@@ -10,18 +10,20 @@ bool isWhite(char c);
 bool isPlus(char c);
 bool isMinus(char c);
 
-void printpoly(List coeffs, List degrees);
+void parsepoly(List coeffs, List degrees);
+void printpoly(List coeff, List degrees);
 
 int main(void) {
-  struct ListObj *coeff_list1 = newList();
-  struct ListObj *degree_list1 = newList();
+  List coeff_list1 = newList();
+  List degree_list1 = newList();
+  parsepoly(coeff_list1, degree_list1);
   printpoly(coeff_list1, degree_list1);
   freeList(&coeff_list1);
   freeList(&degree_list1);
   return 0;
 }
 
-void printpoly(List coeff_list, List degree_list) {
+void parsepoly(List coeff_list, List degree_list) {
   bool negative = false;
   bool variable = false;
   int num_vars = 0;
@@ -36,15 +38,15 @@ void printpoly(List coeff_list, List degree_list) {
     char character = poly[i];
     // if we read in a variable add it to the variable count
     if (isVar(character)) {
-	variable = true;
-	num_vars++;
+      variable = true;
+      num_vars++;
     }
     // if we read in a minus sign, we change the bool negative to true so that
     // the next number we read in will be converted to negative
     if (isMinus(character)) {
       negative = true;
     }
-   
+
     // if we have read in a number
     // we add the number to an array where we will store all the digits of that
     // number
@@ -56,18 +58,18 @@ void printpoly(List coeff_list, List degree_list) {
                     // we can put it in the array
     }
 
-    //if we read in a variable and there is no number that has been read in
-    // right before it then the coeff is 1 or -1 so we append 1  or -1 to our coeff
-    // list and update the num_coeffs
+    // if we read in a variable and there is no number that has been read in
+    // right before it then the coeff is 1 or -1 so we append 1  or -1 to our
+    // coeff list and update the num_coeffs
     else if (isVar(character) && nums[0] == 0) {
-	if (negative) {
-	    appendList(coeff_list, -1);
-	    num_coeffs++;
-	    negative = false;
-	} else {
-            appendList(coeff_list, 1);
-            num_coeffs++;
-	}
+      if (negative) {
+        appendList(coeff_list, -1);
+        num_coeffs++;
+        negative = false;
+      } else {
+        appendList(coeff_list, 1);
+        num_coeffs++;
+      }
     }
     // if we read in a variable and nums[0] != 0 that means that an entire
     // coefficient has been read in so we loop through the nums array and form
@@ -87,13 +89,13 @@ void printpoly(List coeff_list, List degree_list) {
         negative = false;
       }
       if (num_coeffs == 0 || num_coeffs == num_degrees) {
-         appendList(coeff_list, num);
-         num_coeffs++;
-        
+        appendList(coeff_list, num);
+        num_coeffs++;
+
       } else if (num_degrees < num_coeffs) {
         appendList(degree_list, num);
         num_degrees++;
-	variable = false;
+        variable = false;
       }
       for (int i = 0; i < 5; i++) {
         nums[i] = 0;
@@ -103,7 +105,8 @@ void printpoly(List coeff_list, List degree_list) {
     // if we read in a whitespace character and there is no number that has been
     // read in right before it then the degree is 1 so we append 1 to our degree
     // list and update the num_degrees
-    else if (isWhite(character) && variable == true && nums[0] == 0 && num_degrees < num_coeffs) {
+    else if (isWhite(character) && variable == true && nums[0] == 0 &&
+             num_degrees < num_coeffs) {
       appendList(degree_list, 1);
       num_degrees++;
       variable = false;
@@ -112,7 +115,8 @@ void printpoly(List coeff_list, List degree_list) {
     // means the last term was a constant which means that the degree was 0, we
     // need to append 0 to our degree list and update the num_degrees in order
     // to keep our lists consistent
-    else if (isWhite(character) && variable == false && num_coeffs > num_degrees) {
+    else if (isWhite(character) && variable == false &&
+             num_coeffs > num_degrees) {
       appendList(degree_list, 0);
       num_degrees++;
       variable = false;
@@ -133,7 +137,8 @@ void printpoly(List coeff_list, List degree_list) {
     if (num_coeffs == 0 || num_coeffs == num_degrees) {
       appendList(coeff_list, num);
       num_coeffs++;
-      appendList(degree_list, 0); // if its a constant, that means the degree is 0
+      appendList(degree_list,
+                 0); // if its a constant, that means the degree is 0
       num_degrees++;
       variable = false;
     } else if (num_degrees < num_coeffs) {
@@ -150,8 +155,24 @@ void printpoly(List coeff_list, List degree_list) {
     num_degrees++;
     variable = false;
   }
+}
+
+void printpoly(List coeff_list, List degree_list) {
   printList(coeff_list);
-  printList(degree_list);
+  delElement(coeff_list, max(coeff_list));
+  printList(coeff_list);
+  //printList(degree_list);
+  List temp_coeffs = newList();
+  List temp_degrees = newList();
+  //while (length(degree_list) > 0) {
+    //printf("%d", max(degree_list));
+    
+    //appendList(temp_degrees, delElement(degree_list, max(degree_list))); // delete max element from degree list
+                                                                         // and add it to temp_degrees
+    //appendList(temp_coeffs, delElement(coeff_list, max(coeff_list))); // same for the coeff                          
+  //}
+  //printList(temp_coeffs);
+  //printList(temp_degrees);
 }
 
 bool isVar(char c) { return (c >= 97 && c <= 122); }
