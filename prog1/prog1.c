@@ -11,28 +11,69 @@ bool isPlus(char c);
 bool isMinus(char c);
 
 void parsePoly(List coeffs, List degrees, char poly[], char *var);
-void printPoly(List coeff, List degrees, char var);
+void sortPoly(List coeff_list, List degree_list, List save_coeffs_print, List save_degrees_print, List save_coeffs_mult, List save_degrees_mult);
+void printPoly(List temp_coeffs, List temp_degrees, char var);
+void polyMult(List coeffs1, List degrees1, List coeffs2, List degrees2, char var);
+
+List store_coeffs1_print; //allows us to store coeffs of first polynomial to print
+List store_degrees1_print; // allows us to store degrees of first polynomial to print
+
+List store_coeffs1_mult; // allows us to store coeffs of first polynomial to multiply
+List store_degrees1_mult; //allows us to store degrees of first polynomial to multiply
+
+List store_coeffs2_print; // allows us to store coeffs of second polynomial to print
+List store_degrees2_print; // allows us to store degrees of second polynomial to print
+
+List store_coeffs2_mult; // allows us to store coeffs of second polynomial to multiply
+List store_degrees2_mult; // allows us to store degrees of second polynomial to multiply
 
 int main(void) {
   List coeff_list1 = newList();
   List degree_list1 = newList();
+  store_coeffs1_print = newList();
+  store_degrees1_print = newList();
+  store_coeffs1_mult = newList();
+  store_degrees1_mult = newList();
   char var1;
   char polynomial[1000];
   fgets(polynomial, sizeof(polynomial), stdin);
   parsePoly(coeff_list1, degree_list1, polynomial, &var1);
-  printPoly(coeff_list1, degree_list1, var1);
+  sortPoly(coeff_list1, degree_list1, store_coeffs1_print, store_degrees1_print, store_coeffs1_mult, store_degrees1_mult);  
+  printPoly(store_coeffs1_print, store_degrees1_print, var1);
   freeList(&coeff_list1);
   freeList(&degree_list1);
-
+  freeList(&store_coeffs1_print);
+  freeList(&store_degrees1_print);
+  
+  printList(store_coeffs1_mult);
+  printList(store_degrees1_mult);
+  
+  // second polynomial
   List coeff_list2 = newList();
   List degree_list2 = newList();
+  store_coeffs2_print = newList();
+  store_degrees2_print = newList();
+  store_coeffs2_mult = newList();
+  store_degrees2_mult = newList();
   char var2;
   char poly2[1000];
   fgets(poly2, sizeof(poly2), stdin);
   parsePoly(coeff_list2, degree_list2, poly2, &var2);
-  printPoly(coeff_list2, degree_list2, var2);
+  sortPoly(coeff_list2, degree_list2, store_coeffs2_print, store_degrees2_print, store_coeffs2_mult, store_degrees2_mult);
+  printPoly(store_coeffs2_print, store_degrees2_print, var2);
   freeList(&coeff_list2);
-  freeList(&degree_list2); 
+  freeList(&degree_list2);
+  freeList(&store_coeffs2_print);
+  freeList(&store_degrees2_print);
+  
+  printList(store_coeffs2_mult);
+  printList(store_degrees2_mult);
+
+  // multiplication
+  freeList(&store_coeffs1_mult);
+  freeList(&store_degrees1_mult);
+  freeList(&store_coeffs2_mult);
+  freeList(&store_degrees2_mult);
   return 0;
 }
 
@@ -64,7 +105,6 @@ void parsePoly(List coeff_list, List degree_list, char poly[], char *var) {
     // we add the number to an array where we will store all the digits of that
     // number
     else if (isNum(character)) {
-      // printf("%c ", character);
       int num = character - '0'; // converts the character to an int
       nums[nums_index] = num;    // adds the int to the number array
       nums_index++; // updates the array index so that if there is another digit
@@ -170,34 +210,32 @@ void parsePoly(List coeff_list, List degree_list, char poly[], char *var) {
   }
 }
 
-void printPoly(List coeff_list, List degree_list, char var) {
-  List temp_coeffs = newList();
-  List temp_degrees = newList();
+void sortPoly(List coeff_list, List degree_list, List save_coeffs_print, List save_degrees_print, List save_coeffs_mult, List save_degrees_mult) {
   while (length(degree_list) > 0) {
     int max_index = max(degree_list);
-    appendList(temp_degrees,
-               delElement(degree_list,
-                          max_index)); // delete max element from degree list
-                                       // and add it to temp_degrees
-    appendList(temp_coeffs,
-               delElement(coeff_list,
-                          max_index)); // do the same for corresponding coeff
+    int curr_degree = delElement(degree_list, max_index);
+    int curr_coeff = delElement(coeff_list, max_index);
+    appendList(save_degrees_print, curr_degree); // store the degrees temporarily so we can print
+    appendList(save_coeffs_print, curr_coeff); // store the coeffs temporarily so we can print 
+    appendList(save_degrees_mult, curr_degree); // store the degrees temporarily so we can multiply
+    appendList(save_coeffs_mult, curr_coeff); // store the coeffs temporarily so we can multiply
   }
-  //printList(temp_degrees);
-  //printList(temp_coeffs);
+}
 
+void printPoly(List temp_coeffs, List temp_degrees, char var) {
   int term = 0; // to keep track of which term we are on
   while (length(temp_degrees) != 0) {
     int curr_degree = delElement(temp_degrees, 0);
-    int curr_coeff = delElement(temp_coeffs, 0);
+    int curr_coeff = delElement(temp_coeffs, 0);  
 
     if (curr_degree == 0) {
       if (term == 0) {
         printf("%d", curr_coeff); // if degree = 0 and it's the first term
       } else {
         if (curr_coeff < 0) {
-          printf(" - %d", curr_coeff * -1); // if degree = 0 and it's not the first
-                                       // term and the coeff is negative
+          printf(" - %d",
+                 curr_coeff * -1); // if degree = 0 and it's not the first
+                                   // term and the coeff is negative
         } else {
           printf(" + %d", curr_coeff); // if degree = 0 and it's not the first
                                        // term and the coeff is positive
@@ -206,15 +244,17 @@ void printPoly(List coeff_list, List degree_list, char var) {
     } else if (curr_degree == 1) {
       if (term == 0) {
         if (curr_coeff == -1) {
-          printf("-%c", var); // if degree = 1 and it's the first term and the coeff is -1
+          printf(
+              "-%c",
+              var); // if degree = 1 and it's the first term and the coeff is -1
         } else if (curr_coeff == 1) {
           printf("%c",
                  var); // if degree = 1 and it's the first term and coeff is 1
         } else {
           if (curr_coeff < 0) {
             printf("-%d%c", curr_coeff * -1, var); // if degree = 1 and it's the
-                                              // first term and coeff is
-                                              // negative
+                                                   // first term and coeff is
+                                                   // negative
           } else {
             printf("%d%c", curr_coeff, var); // if degree = 1 and it's the first
                                              // term and coeff is positive
@@ -222,14 +262,19 @@ void printPoly(List coeff_list, List degree_list, char var) {
         }
       } else {
         if (curr_coeff == -1) {
-          printf(" - %c", var); // if degree = 1 and it's not the first term and coeff is -1
+          printf(
+              " - %c",
+              var); // if degree = 1 and it's not the first term and coeff is -1
         } else if (curr_coeff == 1) {
-          printf(" + %c", var); // if degree = 1 and it's not the first term and coeff is 1
+          printf(
+              " + %c",
+              var); // if degree = 1 and it's not the first term and coeff is 1
         } else {
           if (curr_coeff < 0) {
-            printf(" - %d%c", curr_coeff * -1, var); // if degree = 1 and it's not
-                                                // the first term and coeff is
-                                                // negative
+            printf(" - %d%c", curr_coeff * -1,
+                   var); // if degree = 1 and it's not
+                         // the first term and coeff is
+                         // negative
           } else {
             printf(" + %d%c", curr_coeff, var); // if degree = 1 and it's not
                                                 // the first term and coeff is
@@ -247,11 +292,13 @@ void printPoly(List coeff_list, List degree_list, char var) {
                                              // term and coeff is 1
         } else {
           if (curr_coeff < 0) {
-            printf("-%d%c^%d", curr_coeff * -1, var, curr_degree); // if degree > 1 and it's the first term and
-                                 			      // coeff is negative
+            printf("-%d%c^%d", curr_coeff * -1, var,
+                   curr_degree); // if degree > 1 and it's the first term and
+                                 // coeff is negative
           } else {
-            printf("%d%c^%d", curr_coeff, var, curr_degree); // if degree > 1 and it's the first term and
-                                 			     // coeff is positive
+            printf("%d%c^%d", curr_coeff, var,
+                   curr_degree); // if degree > 1 and it's the first term and
+                                 // coeff is positive
           }
         }
       } else {
@@ -264,11 +311,13 @@ void printPoly(List coeff_list, List degree_list, char var) {
                                                 // the first term and coeff is 1
         } else {
           if (curr_coeff < 0) {
-            printf(" - %d%c^%d", curr_coeff * -1, var, curr_degree); // if degree > 1 and it's not the first term
-                                                                     // and coeff is negative
+            printf(" - %d%c^%d", curr_coeff * -1, var,
+                   curr_degree); // if degree > 1 and it's not the first term
+                                 // and coeff is negative
           } else {
-            printf(" + %d%c^%d", curr_coeff, var, curr_degree); // if degree > 1 and it's not the first term
-                                                                // and coeff is positive
+            printf(" + %d%c^%d", curr_coeff, var,
+                   curr_degree); // if degree > 1 and it's not the first term
+                                 // and coeff is positive
           }
         }
       }
@@ -276,6 +325,9 @@ void printPoly(List coeff_list, List degree_list, char var) {
     term++;
   }
   printf("\n");
+}
+
+void polyMult(List coeffs1, List degrees1, List coeffs2, List degrees2, char var) {  
 }
 
 bool isVar(char c) { return (c >= 97 && c <= 122); }
