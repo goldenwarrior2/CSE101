@@ -1,5 +1,4 @@
 #include "List.h"
-#include "MoreListFunctions.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -11,21 +10,33 @@ bool isWhite(char c);
 bool isPlus(char c);
 bool isMinus(char c);
 
-void parsePoly(List coeffs, List degrees, char* var);
+void parsePoly(List coeffs, List degrees, char poly[], char *var);
 void printPoly(List coeff, List degrees, char var);
 
 int main(void) {
   List coeff_list1 = newList();
   List degree_list1 = newList();
   char var1;
-  parsePoly(coeff_list1, degree_list1, &var1);
+  char polynomial[1000];
+  fgets(polynomial, sizeof(polynomial), stdin);
+  parsePoly(coeff_list1, degree_list1, polynomial, &var1);
   printPoly(coeff_list1, degree_list1, var1);
   freeList(&coeff_list1);
   freeList(&degree_list1);
+
+  List coeff_list2 = newList();
+  List degree_list2 = newList();
+  char var2;
+  char poly2[1000];
+  fgets(poly2, sizeof(poly2), stdin);
+  parsePoly(coeff_list2, degree_list2, poly2, &var2);
+  printPoly(coeff_list2, degree_list2, var2);
+  freeList(&coeff_list2);
+  freeList(&degree_list2); 
   return 0;
 }
 
-void parsePoly(List coeff_list, List degree_list, char *var) {
+void parsePoly(List coeff_list, List degree_list, char poly[], char *var) {
   bool negative = false;
   bool variable = false;
   int num_vars = 0;
@@ -33,14 +44,13 @@ void parsePoly(List coeff_list, List degree_list, char *var) {
   int num_degrees = 0;
   int nums[5] = {0, 0, 0, 0, 0};
   int nums_index = 0;
-  char poly[100];
-  fgets(poly, sizeof(poly), stdin);
+
   // loops through one polynomial
   for (int i = 0; i < strlen(poly); i++) {
     char character = poly[i];
     // if we read in a variable add it to the variable count
     if (isVar(character)) {
-      *var = character; 
+      *var = character;
       variable = true;
       num_vars++;
     }
@@ -161,20 +171,111 @@ void parsePoly(List coeff_list, List degree_list, char *var) {
 }
 
 void printPoly(List coeff_list, List degree_list, char var) {
-  //printList(coeff_list);
-  //printList(degree_list);
   List temp_coeffs = newList();
   List temp_degrees = newList();
   while (length(degree_list) > 0) {
     int max_index = max(degree_list);
-    appendList(temp_degrees, delElement(degree_list, max_index)); //delete max element from degree list
-  									 // and add it to temp_degrees
-    appendList(temp_coeffs, delElement(coeff_list, max_index)); // do the same for corresponding coeff
+    appendList(temp_degrees,
+               delElement(degree_list,
+                          max_index)); // delete max element from degree list
+                                       // and add it to temp_degrees
+    appendList(temp_coeffs,
+               delElement(coeff_list,
+                          max_index)); // do the same for corresponding coeff
   }
   //printList(temp_degrees);
   //printList(temp_coeffs);
 
-  printPolynomial(temp_degrees, temp_coeffs, var);  
+  int term = 0; // to keep track of which term we are on
+  while (length(temp_degrees) != 0) {
+    int curr_degree = delElement(temp_degrees, 0);
+    int curr_coeff = delElement(temp_coeffs, 0);
+
+    if (curr_degree == 0) {
+      if (term == 0) {
+        printf("%d", curr_coeff); // if degree = 0 and it's the first term
+      } else {
+        if (curr_coeff < 0) {
+          printf(" - %d", curr_coeff * -1); // if degree = 0 and it's not the first
+                                       // term and the coeff is negative
+        } else {
+          printf(" + %d", curr_coeff); // if degree = 0 and it's not the first
+                                       // term and the coeff is positive
+        }
+      }
+    } else if (curr_degree == 1) {
+      if (term == 0) {
+        if (curr_coeff == -1) {
+          printf("-%c", var); // if degree = 1 and it's the first term and the coeff is -1
+        } else if (curr_coeff == 1) {
+          printf("%c",
+                 var); // if degree = 1 and it's the first term and coeff is 1
+        } else {
+          if (curr_coeff < 0) {
+            printf("-%d%c", curr_coeff * -1, var); // if degree = 1 and it's the
+                                              // first term and coeff is
+                                              // negative
+          } else {
+            printf("%d%c", curr_coeff, var); // if degree = 1 and it's the first
+                                             // term and coeff is positive
+          }
+        }
+      } else {
+        if (curr_coeff == -1) {
+          printf(" - %c", var); // if degree = 1 and it's not the first term and coeff is -1
+        } else if (curr_coeff == 1) {
+          printf(" + %c", var); // if degree = 1 and it's not the first term and coeff is 1
+        } else {
+          if (curr_coeff < 0) {
+            printf(" - %d%c", curr_coeff * -1, var); // if degree = 1 and it's not
+                                                // the first term and coeff is
+                                                // negative
+          } else {
+            printf(" + %d%c", curr_coeff, var); // if degree = 1 and it's not
+                                                // the first term and coeff is
+                                                // positive
+          }
+        }
+      }
+    } else {
+      if (term == 0) {
+        if (curr_coeff == -1) {
+          printf("-%c^%d", var, curr_degree); // if degree > 1 and it's the
+                                              // first term and coeff is -1
+        } else if (curr_coeff == 1) {
+          printf("%c^%d", var, curr_degree); // if degree > 1 and it's the first
+                                             // term and coeff is 1
+        } else {
+          if (curr_coeff < 0) {
+            printf("-%d%c^%d", curr_coeff * -1, var, curr_degree); // if degree > 1 and it's the first term and
+                                 			      // coeff is negative
+          } else {
+            printf("%d%c^%d", curr_coeff, var, curr_degree); // if degree > 1 and it's the first term and
+                                 			     // coeff is positive
+          }
+        }
+      } else {
+        if (curr_coeff == -1) {
+          printf(" - %c^%d", var, curr_degree); // if degree > 1 and it's not
+                                                // the first term and coeff is
+                                                // -1
+        } else if (curr_coeff == 1) {
+          printf(" + %c^%d", var, curr_degree); // if degree > 1 and it's not
+                                                // the first term and coeff is 1
+        } else {
+          if (curr_coeff < 0) {
+            printf(" - %d%c^%d", curr_coeff * -1, var, curr_degree); // if degree > 1 and it's not the first term
+                                                                     // and coeff is negative
+          } else {
+            printf(" + %d%c^%d", curr_coeff, var, curr_degree); // if degree > 1 and it's not the first term
+                                                                // and coeff is positive
+          }
+        }
+      }
+    }
+    term++;
+  }
+  printf("\n");
 }
 
 bool isVar(char c) { return (c >= 97 && c <= 122); }
