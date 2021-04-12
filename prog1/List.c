@@ -1,4 +1,5 @@
 #include "List.h"
+#include "MoreListFunctions.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -169,4 +170,14 @@ void printList(List L) {
     }
   }
   printf("\n");
+}
+
+void printPolynomial(List degrees, List coeffs, char var) {
+  Node *curr_degree = degrees->head;
+  Node *curr_coeff = coeffs->head;
+  while (curr_degree != NULL) {
+	printf("%d %d\n", curr_degree->data, curr_coeff->data);
+	curr_degree = curr_degree->next;
+	curr_coeff = curr_coeff->next;
+  }
 }

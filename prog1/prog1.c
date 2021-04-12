@@ -1,4 +1,5 @@
 #include "List.h"
+#include "MoreListFunctions.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
@@ -160,8 +161,8 @@ void parsePoly(List coeff_list, List degree_list, char *var) {
 }
 
 void printPoly(List coeff_list, List degree_list, char var) {
-  printList(coeff_list);
-  printList(degree_list);
+  //printList(coeff_list);
+  //printList(degree_list);
   List temp_coeffs = newList();
   List temp_degrees = newList();
   while (length(degree_list) > 0) {
@@ -170,11 +171,10 @@ void printPoly(List coeff_list, List degree_list, char var) {
   									 // and add it to temp_degrees
     appendList(temp_coeffs, delElement(coeff_list, max_index)); // do the same for corresponding coeff
   }
-  printList(temp_degrees);
-  printList(temp_coeffs);
-  
-  //Node *curr_degree = temp_degrees->head;
-  //Node *curr_coeff = temp_coeffs->head;  
+  //printList(temp_degrees);
+  //printList(temp_coeffs);
+
+  printPolynomial(temp_degrees, temp_coeffs, var);  
 }
 
 bool isVar(char c) { return (c >= 97 && c <= 122); }
