@@ -10,20 +10,21 @@ bool isWhite(char c);
 bool isPlus(char c);
 bool isMinus(char c);
 
-void parsepoly(List coeffs, List degrees);
-void printpoly(List coeff, List degrees);
+void parsePoly(List coeffs, List degrees, char* var);
+void printPoly(List coeff, List degrees, char var);
 
 int main(void) {
   List coeff_list1 = newList();
   List degree_list1 = newList();
-  parsepoly(coeff_list1, degree_list1);
-  printpoly(coeff_list1, degree_list1);
+  char var1;
+  parsePoly(coeff_list1, degree_list1, &var1);
+  printPoly(coeff_list1, degree_list1, var1);
   freeList(&coeff_list1);
   freeList(&degree_list1);
   return 0;
 }
 
-void parsepoly(List coeff_list, List degree_list) {
+void parsePoly(List coeff_list, List degree_list, char *var) {
   bool negative = false;
   bool variable = false;
   int num_vars = 0;
@@ -38,6 +39,7 @@ void parsepoly(List coeff_list, List degree_list) {
     char character = poly[i];
     // if we read in a variable add it to the variable count
     if (isVar(character)) {
+      *var = character; 
       variable = true;
       num_vars++;
     }
@@ -157,22 +159,22 @@ void parsepoly(List coeff_list, List degree_list) {
   }
 }
 
-void printpoly(List coeff_list, List degree_list) {
+void printPoly(List coeff_list, List degree_list, char var) {
   printList(coeff_list);
-  delElement(coeff_list, max(coeff_list));
-  printList(coeff_list);
-  //printList(degree_list);
+  printList(degree_list);
   List temp_coeffs = newList();
   List temp_degrees = newList();
-  //while (length(degree_list) > 0) {
-    //printf("%d", max(degree_list));
-    
-    //appendList(temp_degrees, delElement(degree_list, max(degree_list))); // delete max element from degree list
-                                                                         // and add it to temp_degrees
-    //appendList(temp_coeffs, delElement(coeff_list, max(coeff_list))); // same for the coeff                          
-  //}
-  //printList(temp_coeffs);
-  //printList(temp_degrees);
+  while (length(degree_list) > 0) {
+    int max_index = max(degree_list);
+    appendList(temp_degrees, delElement(degree_list, max_index)); //delete max element from degree list
+  									 // and add it to temp_degrees
+    appendList(temp_coeffs, delElement(coeff_list, max_index)); // do the same for corresponding coeff
+  }
+  printList(temp_degrees);
+  printList(temp_coeffs);
+  
+  //Node *curr_degree = temp_degrees->head;
+  //Node *curr_coeff = temp_coeffs->head;  
 }
 
 bool isVar(char c) { return (c >= 97 && c <= 122); }
