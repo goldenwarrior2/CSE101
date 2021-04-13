@@ -160,13 +160,8 @@ int delElement(List L, int i) {
 void printList(List L) {
   Node *curr_node = L->head;
   while (curr_node != NULL) {
-    if (curr_node->next == NULL) {
-      printf("%d", curr_node->data);
-      curr_node = curr_node->next;
-    } else {
-      printf("%d, ", curr_node->data);
-      curr_node = curr_node->next;
-    }
+    printf("%d, ", curr_node->data);
+    curr_node = curr_node->next;
   }
   printf("\n");
 }

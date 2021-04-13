@@ -11,21 +11,34 @@ bool isPlus(char c);
 bool isMinus(char c);
 
 void parsePoly(List coeffs, List degrees, char poly[], char *var);
-void sortPoly(List coeff_list, List degree_list, List save_coeffs_print, List save_degrees_print, List save_coeffs_mult, List save_degrees_mult);
+void sortPoly(List coeff_list, List degree_list, List save_coeffs_print,
+              List save_degrees_print, List save_coeffs_mult,
+              List save_degrees_mult);
 void printPoly(List temp_coeffs, List temp_degrees, char var);
-void polyMult(List coeffs1, List degrees1, List coeffs2, List degrees2, char var);
+void polyMult(List coeffs1, List degrees1, List coeffs2, List degrees2);
 
-List store_coeffs1_print; //allows us to store coeffs of first polynomial to print
-List store_degrees1_print; // allows us to store degrees of first polynomial to print
+List store_coeffs1_print; // allows us to store coeffs of first polynomial to
+                          // print
+List store_degrees1_print; // allows us to store degrees of first polynomial to
+                           // print
 
-List store_coeffs1_mult; // allows us to store coeffs of first polynomial to multiply
-List store_degrees1_mult; //allows us to store degrees of first polynomial to multiply
+List store_coeffs1_mult;  // allows us to store coeffs of first polynomial to
+                          // multiply
+List store_degrees1_mult; // allows us to store degrees of first polynomial to
+                          // multiply
 
-List store_coeffs2_print; // allows us to store coeffs of second polynomial to print
-List store_degrees2_print; // allows us to store degrees of second polynomial to print
+List store_coeffs2_print;  // allows us to store coeffs of second polynomial to
+                           // print
+List store_degrees2_print; // allows us to store degrees of second polynomial to
+                           // print
 
-List store_coeffs2_mult; // allows us to store coeffs of second polynomial to multiply
-List store_degrees2_mult; // allows us to store degrees of second polynomial to multiply
+List store_coeffs2_mult;  // allows us to store coeffs of second polynomial to
+                          // multiply
+List store_degrees2_mult; // allows us to store degrees of second polynomial to
+                          // multiply
+
+List mult_degrees;
+List mult_coeffs;
 
 int main(void) {
   List coeff_list1 = newList();
@@ -38,16 +51,17 @@ int main(void) {
   char polynomial[1000];
   fgets(polynomial, sizeof(polynomial), stdin);
   parsePoly(coeff_list1, degree_list1, polynomial, &var1);
-  sortPoly(coeff_list1, degree_list1, store_coeffs1_print, store_degrees1_print, store_coeffs1_mult, store_degrees1_mult);  
+  sortPoly(coeff_list1, degree_list1, store_coeffs1_print, store_degrees1_print,
+           store_coeffs1_mult, store_degrees1_mult);
   printPoly(store_coeffs1_print, store_degrees1_print, var1);
   freeList(&coeff_list1);
   freeList(&degree_list1);
   freeList(&store_coeffs1_print);
   freeList(&store_degrees1_print);
-  
-  printList(store_coeffs1_mult);
-  printList(store_degrees1_mult);
-  
+
+  //printList(store_coeffs1_mult);
+  //printList(store_degrees1_mult);
+
   // second polynomial
   List coeff_list2 = newList();
   List degree_list2 = newList();
@@ -65,11 +79,16 @@ int main(void) {
   freeList(&degree_list2);
   freeList(&store_coeffs2_print);
   freeList(&store_degrees2_print);
-  
-  printList(store_coeffs2_mult);
-  printList(store_degrees2_mult);
+
+  //printList(store_coeffs2_mult);
+  //printList(store_degrees2_mult);
 
   // multiplication
+  mult_degrees = newList();
+  mult_coeffs = newList();
+  polyMult(store_coeffs1_mult, store_degrees1_mult, store_coeffs2_mult, store_degrees2_mult);
+  printList(mult_coeffs);
+  printList(mult_degrees);
   freeList(&store_coeffs1_mult);
   freeList(&store_degrees1_mult);
   freeList(&store_coeffs2_mult);
@@ -210,15 +229,21 @@ void parsePoly(List coeff_list, List degree_list, char poly[], char *var) {
   }
 }
 
-void sortPoly(List coeff_list, List degree_list, List save_coeffs_print, List save_degrees_print, List save_coeffs_mult, List save_degrees_mult) {
+void sortPoly(List coeff_list, List degree_list, List save_coeffs_print,
+              List save_degrees_print, List save_coeffs_mult,
+              List save_degrees_mult) {
   while (length(degree_list) > 0) {
     int max_index = max(degree_list);
     int curr_degree = delElement(degree_list, max_index);
     int curr_coeff = delElement(coeff_list, max_index);
-    appendList(save_degrees_print, curr_degree); // store the degrees temporarily so we can print
-    appendList(save_coeffs_print, curr_coeff); // store the coeffs temporarily so we can print 
-    appendList(save_degrees_mult, curr_degree); // store the degrees temporarily so we can multiply
-    appendList(save_coeffs_mult, curr_coeff); // store the coeffs temporarily so we can multiply
+    appendList(save_degrees_print,
+               curr_degree); // store the degrees temporarily so we can print
+    appendList(save_coeffs_print,
+               curr_coeff); // store the coeffs temporarily so we can print
+    appendList(save_degrees_mult,
+               curr_degree); // store the degrees temporarily so we can multiply
+    appendList(save_coeffs_mult,
+               curr_coeff); // store the coeffs temporarily so we can multiply
   }
 }
 
@@ -226,7 +251,7 @@ void printPoly(List temp_coeffs, List temp_degrees, char var) {
   int term = 0; // to keep track of which term we are on
   while (length(temp_degrees) != 0) {
     int curr_degree = delElement(temp_degrees, 0);
-    int curr_coeff = delElement(temp_coeffs, 0);  
+    int curr_coeff = delElement(temp_coeffs, 0);
 
     if (curr_degree == 0) {
       if (term == 0) {
@@ -327,9 +352,43 @@ void printPoly(List temp_coeffs, List temp_degrees, char var) {
   printf("\n");
 }
 
-void polyMult(List coeffs1, List degrees1, List coeffs2, List degrees2, char var) {  
+void polyMult(List coeffs1, List degrees1, List coeffs2, List degrees2) {
+  printList(coeffs1);
+  printList(degrees1);
+  printList(coeffs2);
+  printList(degrees2);
+  if (length(degrees1) >= length(degrees2)) {
+      for (int i = 0; i < length(degrees1); i++) {
+        int first_degree = delElement(degrees1, 0); // stores degree of first polynomial
+        int first_coeff = delElement(coeffs1, 0); // stores coeff of first polynomial
+        for (int j = 0; j < length(degrees2); j++) {
+          int sec_degree = delElement(degrees2, 0); // stores degree of second polynomial
+          int sec_coeff = delElement(coeffs2, 0); // stores coeff of second polynomial
+          //printf("%d %d\n", first_degree, sec_degree);
+	  //printf("%d %d\n", first_coeff, sec_coeff);
+          appendList(degrees2, sec_degree); // add the degree back to the list so we can reaccess it
+          appendList(coeffs2, sec_coeff); // add the coeff back to the list so we can reaccess it
+          appendList(mult_coeffs, first_coeff * sec_coeff); // multiply the coeffs and add them to the list
+          appendList(mult_degrees, first_degree + sec_degree); // add the degrees and add them to the list
+        }
+      }
+  } else {
+	for (int i = 0; i < length(degrees2); i++) {
+          int first_degree = delElement(degrees2, 0); // stores degree of first polynomial
+          int first_coeff = delElement(coeffs2, 0); // stores coeff of first polynomial
+          for (int j = 0; j < length(degrees1); j++) {
+            int sec_degree = delElement(degrees1, 0); // stores degree of second polynomial
+            int sec_coeff = delElement(coeffs1, 0); // stores coeff of second polynomial
+	    //printf("%d %d\n", first_degree, sec_degree);
+            //printf("%d %d\n", first_coeff, sec_coeff);
+            appendList(degrees1, sec_degree); // add the degree back to the list so we can reaccess it
+            appendList(coeffs1, sec_coeff); // add the coeff back to the list so we can reaccess it
+            appendList(mult_coeffs, first_coeff * sec_coeff); // multiply the coeffs and add them to the list
+            appendList(mult_degrees, first_degree + sec_degree); // add the degrees and add them to the list
+          }
+        }  
+    }
 }
-
 bool isVar(char c) { return (c >= 97 && c <= 122); }
 
 bool isPower(char c) { return (c == 94); }
