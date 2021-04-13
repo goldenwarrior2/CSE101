@@ -11,88 +11,64 @@ bool isPlus(char c);
 bool isMinus(char c);
 
 void parsePoly(List coeffs, List degrees, char poly[], char *var);
-void sortPoly(List coeff_list, List degree_list, List save_coeffs_print,
-              List save_degrees_print, List save_coeffs_mult,
-              List save_degrees_mult);
+void sortPoly(List coeff_list, List degree_list, List temp_coeffs, List temp_degrees);
 void printPoly(List temp_coeffs, List temp_degrees, char var);
 void polyMult(List coeffs1, List degrees1, List coeffs2, List degrees2);
 
-List store_coeffs1_print; // allows us to store coeffs of first polynomial to
-                          // print
-List store_degrees1_print; // allows us to store degrees of first polynomial to
-                           // print
-
-List store_coeffs1_mult;  // allows us to store coeffs of first polynomial to
-                          // multiply
-List store_degrees1_mult; // allows us to store degrees of first polynomial to
-                          // multiply
-
-List store_coeffs2_print;  // allows us to store coeffs of second polynomial to
-                           // print
-List store_degrees2_print; // allows us to store degrees of second polynomial to
-                           // print
-
-List store_coeffs2_mult;  // allows us to store coeffs of second polynomial to
-                          // multiply
-List store_degrees2_mult; // allows us to store degrees of second polynomial to
-                          // multiply
-
-List mult_degrees;
 List mult_coeffs;
+List mult_degrees;
+List temp_coeffs1;
+List temp_degrees1;
+List temp_coeffs2;
+List temp_degrees2;
+List temp_multcoeffs;
+List temp_multdegrees;
 
 int main(void) {
   List coeff_list1 = newList();
   List degree_list1 = newList();
-  store_coeffs1_print = newList();
-  store_degrees1_print = newList();
-  store_coeffs1_mult = newList();
-  store_degrees1_mult = newList();
-  char var1;
+  temp_coeffs1 = newList();
+  temp_degrees1 = newList();
+  char var;
   char polynomial[1000];
   fgets(polynomial, sizeof(polynomial), stdin);
-  parsePoly(coeff_list1, degree_list1, polynomial, &var1);
-  sortPoly(coeff_list1, degree_list1, store_coeffs1_print, store_degrees1_print,
-           store_coeffs1_mult, store_degrees1_mult);
-  printPoly(store_coeffs1_print, store_degrees1_print, var1);
-  freeList(&coeff_list1);
-  freeList(&degree_list1);
-  freeList(&store_coeffs1_print);
-  freeList(&store_degrees1_print);
-
-  //printList(store_coeffs1_mult);
-  //printList(store_degrees1_mult);
+  parsePoly(coeff_list1, degree_list1, polynomial, &var);
+  //printList(coeff_list1);
+  //printList(degree_list1);
+  sortPoly(coeff_list1, degree_list1, temp_coeffs1, temp_degrees1);
+  //printList(coeff_list1);
+  //printList(degree_list1);
+  printPoly(temp_coeffs1, temp_degrees1, var);
 
   // second polynomial
   List coeff_list2 = newList();
   List degree_list2 = newList();
-  store_coeffs2_print = newList();
-  store_degrees2_print = newList();
-  store_coeffs2_mult = newList();
-  store_degrees2_mult = newList();
-  char var2;
+  temp_coeffs2 = newList();
+  temp_degrees2 = newList();
   char poly2[1000];
   fgets(poly2, sizeof(poly2), stdin);
-  parsePoly(coeff_list2, degree_list2, poly2, &var2);
-  sortPoly(coeff_list2, degree_list2, store_coeffs2_print, store_degrees2_print, store_coeffs2_mult, store_degrees2_mult);
-  printPoly(store_coeffs2_print, store_degrees2_print, var2);
-  freeList(&coeff_list2);
-  freeList(&degree_list2);
-  freeList(&store_coeffs2_print);
-  freeList(&store_degrees2_print);
-
-  //printList(store_coeffs2_mult);
-  //printList(store_degrees2_mult);
+  parsePoly(coeff_list2, degree_list2, poly2, &var);
+  sortPoly(coeff_list2, degree_list2, temp_coeffs2, temp_degrees2);
+  printPoly(temp_coeffs2, temp_degrees2, var);
 
   // multiplication
-  mult_degrees = newList();
   mult_coeffs = newList();
-  polyMult(store_coeffs1_mult, store_degrees1_mult, store_coeffs2_mult, store_degrees2_mult);
-  printList(mult_coeffs);
-  printList(mult_degrees);
-  freeList(&store_coeffs1_mult);
-  freeList(&store_degrees1_mult);
-  freeList(&store_coeffs2_mult);
-  freeList(&store_degrees2_mult);
+  mult_degrees = newList();
+  temp_multcoeffs = newList();
+  temp_multdegrees = newList();
+  polyMult(temp_coeffs1, temp_degrees1, temp_coeffs2, temp_degrees2);
+  //printList(mult_coeffs);
+  //printList(mult_degrees);
+  //sortPoly(mult_coeffs, mult_degrees, temp_multcoeffs, temp_multdegrees);
+  //printList(temp_multcoeffs);
+  //printList(temp_multdegrees); 
+  printPoly(mult_coeffs, mult_degrees, var);
+  freeList(&coeff_list1);
+  freeList(&degree_list1);
+  freeList(&coeff_list2);
+  freeList(&degree_list2);
+  freeList(&mult_coeffs);
+  freeList(&mult_degrees); 
   return 0;
 }
 
@@ -229,29 +205,23 @@ void parsePoly(List coeff_list, List degree_list, char poly[], char *var) {
   }
 }
 
-void sortPoly(List coeff_list, List degree_list, List save_coeffs_print,
-              List save_degrees_print, List save_coeffs_mult,
-              List save_degrees_mult) {
+void sortPoly(List coeff_list, List degree_list, List temp_coeffs, List temp_degrees) {
   while (length(degree_list) > 0) {
     int max_index = max(degree_list);
     int curr_degree = delElement(degree_list, max_index);
     int curr_coeff = delElement(coeff_list, max_index);
-    appendList(save_degrees_print,
-               curr_degree); // store the degrees temporarily so we can print
-    appendList(save_coeffs_print,
-               curr_coeff); // store the coeffs temporarily so we can print
-    appendList(save_degrees_mult,
-               curr_degree); // store the degrees temporarily so we can multiply
-    appendList(save_coeffs_mult,
-               curr_coeff); // store the coeffs temporarily so we can multiply
+    appendList(temp_coeffs, curr_coeff);
+    appendList(temp_degrees, curr_degree);
   }
 }
 
 void printPoly(List temp_coeffs, List temp_degrees, char var) {
   int term = 0; // to keep track of which term we are on
-  while (length(temp_degrees) != 0) {
+  for (int i = 0; i < length(temp_degrees); i++) {
     int curr_degree = delElement(temp_degrees, 0);
+    appendList(temp_degrees, curr_degree);
     int curr_coeff = delElement(temp_coeffs, 0);
+    appendList(temp_coeffs, curr_coeff);
 
     if (curr_degree == 0) {
       if (term == 0) {
@@ -353,14 +323,15 @@ void printPoly(List temp_coeffs, List temp_degrees, char var) {
 }
 
 void polyMult(List coeffs1, List degrees1, List coeffs2, List degrees2) {
-  printList(coeffs1);
-  printList(degrees1);
-  printList(coeffs2);
-  printList(degrees2);
+  //printList(coeffs1);
+  //printList(degrees1);
+  //printList(coeffs2);
+  //printList(degrees2);
   if (length(degrees1) >= length(degrees2)) {
       for (int i = 0; i < length(degrees1); i++) {
         int first_degree = delElement(degrees1, 0); // stores degree of first polynomial
         int first_coeff = delElement(coeffs1, 0); // stores coeff of first polynomial
+ 	appendList(degrees1, first_degree);
         for (int j = 0; j < length(degrees2); j++) {
           int sec_degree = delElement(degrees2, 0); // stores degree of second polynomial
           int sec_coeff = delElement(coeffs2, 0); // stores coeff of second polynomial
@@ -373,9 +344,11 @@ void polyMult(List coeffs1, List degrees1, List coeffs2, List degrees2) {
         }
       }
   } else {
+	//printf("\n%d\n", length(degrees2));
 	for (int i = 0; i < length(degrees2); i++) {
           int first_degree = delElement(degrees2, 0); // stores degree of first polynomial
           int first_coeff = delElement(coeffs2, 0); // stores coeff of first polynomial
+	  appendList(degrees2, first_degree); // to keep the length of degrees2 constant
           for (int j = 0; j < length(degrees1); j++) {
             int sec_degree = delElement(degrees1, 0); // stores degree of second polynomial
             int sec_coeff = delElement(coeffs1, 0); // stores coeff of second polynomial
