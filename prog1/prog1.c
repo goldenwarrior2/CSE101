@@ -68,11 +68,8 @@ int main(void) {
   // simplifying
   simp_coeffs = newList();
   simp_degrees = newList();
-  printList(mult_coeffs);
-  printList(mult_degrees);
-  //polySimplify(mult_coeffs, mult_degrees);
-  //printList(simp_coeffs);
-  //printList(simp_degrees);
+  polySimplify(mult_coeffs, mult_degrees);
+  printPoly(simp_coeffs, simp_degrees, var);
   freeList(&mult_coeffs);
   freeList(&mult_degrees);
   return 0;
@@ -191,8 +188,7 @@ void parsePoly(List coeff_list, List degree_list, char poly[], char *var) {
     if (num_coeffs == 0 || num_coeffs == num_degrees) {
       appendList(coeff_list, num);
       num_coeffs++;
-      appendList(degree_list,
-                 0); // if its a constant, that means the degree is 0
+      appendList(degree_list, 0); // if its a constant, that means the degree is 0
       num_degrees++;
       variable = false;
     } else if (num_degrees < num_coeffs) {
@@ -211,8 +207,7 @@ void parsePoly(List coeff_list, List degree_list, char poly[], char *var) {
   }
 }
 
-void sortPoly(List coeff_list, List degree_list, List temp_coeffs,
-              List temp_degrees) {
+void sortPoly(List coeff_list, List degree_list, List temp_coeffs, List temp_degrees) {
   while (length(degree_list) > 0) {
     int max_index = max(degree_list);
     int curr_degree = delElement(degree_list, max_index);
@@ -235,8 +230,7 @@ void printPoly(List temp_coeffs, List temp_degrees, char var) {
         printf("%d", curr_coeff); // if degree = 0 and it's the first term
       } else {
         if (curr_coeff < 0) {
-          printf(" - %d",
-                 curr_coeff * -1); // if degree = 0 and it's not the first
+          printf(" - %d", curr_coeff * -1); // if degree = 0 and it's not the first
                                    // term and the coeff is negative
         } else {
           printf(" + %d", curr_coeff); // if degree = 0 and it's not the first
@@ -246,12 +240,9 @@ void printPoly(List temp_coeffs, List temp_degrees, char var) {
     } else if (curr_degree == 1) {
       if (term == 0) {
         if (curr_coeff == -1) {
-          printf(
-              "-%c",
-              var); // if degree = 1 and it's the first term and the coeff is -1
+          printf("-%c", var); // if degree = 1 and it's the first term and the coeff is -1
         } else if (curr_coeff == 1) {
-          printf("%c",
-                 var); // if degree = 1 and it's the first term and coeff is 1
+          printf("%c", var); // if degree = 1 and it's the first term and coeff is 1
         } else {
           if (curr_coeff < 0) {
             printf("-%d%c", curr_coeff * -1, var); // if degree = 1 and it's the
@@ -264,17 +255,12 @@ void printPoly(List temp_coeffs, List temp_degrees, char var) {
         }
       } else {
         if (curr_coeff == -1) {
-          printf(
-              " - %c",
-              var); // if degree = 1 and it's not the first term and coeff is -1
+          printf(" - %c", var); // if degree = 1 and it's not the first term and coeff is -1
         } else if (curr_coeff == 1) {
-          printf(
-              " + %c",
-              var); // if degree = 1 and it's not the first term and coeff is 1
+          printf(" + %c", var); // if degree = 1 and it's not the first term and coeff is 1
         } else {
           if (curr_coeff < 0) {
-            printf(" - %d%c", curr_coeff * -1,
-                   var); // if degree = 1 and it's not
+            printf(" - %d%c", curr_coeff * -1, var); // if degree = 1 and it's not
                          // the first term and coeff is
                          // negative
           } else {
@@ -294,8 +280,7 @@ void printPoly(List temp_coeffs, List temp_degrees, char var) {
                                              // term and coeff is 1
         } else {
           if (curr_coeff < 0) {
-            printf("-%d%c^%d", curr_coeff * -1, var,
-                   curr_degree); // if degree > 1 and it's the first term and
+            printf("-%d%c^%d", curr_coeff * -1, var, curr_degree); // if degree > 1 and it's the first term and
                                  // coeff is negative
           } else {
             printf("%d%c^%d", curr_coeff, var,
@@ -313,12 +298,10 @@ void printPoly(List temp_coeffs, List temp_degrees, char var) {
                                                 // the first term and coeff is 1
         } else {
           if (curr_coeff < 0) {
-            printf(" - %d%c^%d", curr_coeff * -1, var,
-                   curr_degree); // if degree > 1 and it's not the first term
+            printf(" - %d%c^%d", curr_coeff * -1, var, curr_degree); // if degree > 1 and it's not the first term
                                  // and coeff is negative
           } else {
-            printf(" + %d%c^%d", curr_coeff, var,
-                   curr_degree); // if degree > 1 and it's not the first term
+            printf(" + %d%c^%d", curr_coeff, var, curr_degree); // if degree > 1 and it's not the first term
                                  // and coeff is positive
           }
         }
@@ -343,26 +326,26 @@ void polyMult(List coeffs1, List degrees1, List coeffs2, List degrees2) {
       appendList(mult_degrees, first_degree + sec_degree); // add the degrees and add them to the list
     }
   }
+  //polySimplify(mult_coeffs, mult_degrees);
 }
 
 void polySimplify(List coeffs, List degrees) {
-    int len = length(degrees); // so we can set the boundary to a constant value
-    for (int i = 0; i < len; i++) {
-	int compare_degree = delElement(degrees, 0); // save each degree
-	int coeff_total = delElement(coeffs, 0); // initialize the coeff total
- 	for (int j = 0; j < len; j++) {
-	    int curr_degree = delElement(degrees, 0);
-	    if (curr_degree == compare_degree) {
-		coeff_total += curr_degree;
-		len--;
-	    } else {
-		appendList(degrees, curr_degree);
-	    }
-	}
-	len--;
-	appendList(simp_degrees, compare_degree);
-	appendList(simp_coeffs, coeff_total);
+  int coeff_total = 0;
+  while (length(degrees) > 0) {
+    int max_index = max(degrees);
+    int curr_degree = delElement(degrees, max_index); // gets each different degree
+    int curr_coeff = delElement(coeffs, max_index); // gets each corresponding coeff
+    coeff_total += curr_coeff;
+    int duplicate = find(degrees, curr_degree);
+    if (duplicate == -1) {
+	if (coeff_total == 0) {
+	} else {
+	    appendList(simp_degrees, curr_degree);
+	    appendList(simp_coeffs, coeff_total);
+	    coeff_total = 0;
+        }
     }
+  }
 }
 
 bool isVar(char c) { return (c >= 97 && c <= 122); }
