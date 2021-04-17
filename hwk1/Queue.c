@@ -32,13 +32,13 @@ void destructQueue(Queue* q) {
 }
 
 void enQueue(Queue* q, int x) {
+  q->arr[q->tail] = x;
+  q->count++; // increases the count of the queue
   if (q->tail != q->length - 1) {
     q->tail++; // increases the tail because an element was added
   } else {
     q->tail = (q->tail + 1) % q->length; // wrap tail to front if it's currenly at the end
   }
-  q->arr[q->count] = x;
-  q->count++; // increases the count of the queue
 }
 
 void deQueue(Queue* q) {

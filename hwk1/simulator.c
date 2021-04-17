@@ -6,17 +6,7 @@
 int main(void) {
   int* array = (int *)calloc(100, sizeof(int));
   Queue* new_queue = initializeQueue(100, array);
-  enQueue(new_queue, 10);
-  enQueue(new_queue, 15);
-  enQueue(new_queue, 5);
-  printQueue(new_queue);
-  enQueue(new_queue, 20);
-  printQueue(new_queue);
-  deQueue(new_queue);
-  printQueue(new_queue);
-  enQueue(new_queue, 10);
-  printQueue(new_queue); 
-  /*int num;
+  int num;
   while (scanf("%d", &num) != -100) {
     if (num > 0) {
       enQueue(new_queue, num);
@@ -31,7 +21,7 @@ int main(void) {
       break;
     }
   } 
-  printQueue(new_queue); */
+  printQueue(new_queue); 
   destructQueue(new_queue);
   return 0;
 }
