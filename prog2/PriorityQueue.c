@@ -16,10 +16,10 @@ int extract_max(Heap* h) {
   if (h->size < 1) {
     fprintf(stderr, "heap underflow");
   }
-  max = h->arr[0];
+  int max = h->arr[0];
   h->arr[0] = h->arr[h->size];
   h->size = h->size - 1;
-  heapify(h->arr, 1);
+  heapify(h, 1);
   return max;
 }
 
@@ -39,5 +39,5 @@ void increase_priority(Heap* h, int i, int new_value){
 void insert(Heap* h, int value) {
   h->size = h->size + 1;
   h->arr[h->size] = -1;
-  increase_priority(h->arr, h->size, value);
+  increase_priority(h, h->size, value);
 }

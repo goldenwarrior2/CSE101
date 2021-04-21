@@ -40,7 +40,7 @@ Heap* initializeHeap(int len, int h_size, int* arr) {
   return new_heap;
 }
 
-void destructHeap(Heap* h, int i) {
+void destructHeap(Heap* h) {
   if (h) {
     free(h->arr);
     free(h);
@@ -62,15 +62,17 @@ void heapify(Heap* h, int i) {
   }
   if (largest != i) {
     swap(h->arr, i, largest);
-    heapify(h->arr, largest);
+    heapify(h, largest);
   }
 }
 
 Heap* array_to_Heap(int* A, int len, int size) {
   size = len;
+  Heap* new_heap = initializeHeap(len, size, A);
   for (int i = len / 2; i >= 0; i--) {
-    heapify(A, i);
+    heapify(new_heap, i);
   }
+  return new_heap;
 }
 
 int size(Heap* h) {

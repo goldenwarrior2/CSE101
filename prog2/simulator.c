@@ -24,7 +24,7 @@ void generateArrival(Queue* q, Heap* h, int pMax)
 {
     if (size(h) == count(q) && size(h) < len(h)){
         int item = rand()%pMax + 1;
-        enqueue(q, item);
+        enQueue(q, item);
         insert(h, item);
     }
 }
@@ -42,7 +42,7 @@ void processQueue(Queue* q, Heap* h, int* sumQ, int* sumPQ, int* processCount, i
     if(rand()%r == 0 && count(q) > 0){
         int x = extract_max(h);
         (*sumPQ) += x;
-        (*sumQ) += dequeue(q);
+        (*sumQ) += deQueue(q);
         (*processCount)++;
     }
 }
