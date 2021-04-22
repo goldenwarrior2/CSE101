@@ -15,23 +15,26 @@ int get_max(Heap* h) {
 int extract_max(Heap* h) {
   if (h->size < 1) {
     fprintf(stderr, "heap underflow");
+    return -1;
+  } else {
+    int max = h->arr[0];
+    h->arr[0] = h->arr[h->size];
+    h->size = h->size - 1;
+    heapify(h, 0);
+    return max;
   }
-  int max = h->arr[0];
-  h->arr[0] = h->arr[h->size];
-  h->size = h->size - 1;
-  heapify(h, 1);
-  return max;
 }
 
 // This function increases priority/value of element at index i to 'new_value'
 void increase_priority(Heap* h, int i, int new_value){
   if ((new_value) < h->arr[i]) {
     fprintf(stderr, "new key smaller than current key");
-  }
-  h->arr[i] = new_value;
-  while (i > 1 && h->arr[parent(i)] < h->arr[i]) {
-    swap(h->arr, i, parent(i));
-    i = parent(i);
+  } else {
+    h->arr[i] = new_value;
+    while (i > 0 && h->arr[parent(i)] < h->arr[i]) {
+      swap(h->arr, i, parent(i));
+      i = parent(i);
+    }
   }
 }
 
