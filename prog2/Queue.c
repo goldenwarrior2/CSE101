@@ -25,7 +25,6 @@ Queue* initializeQueue(int n, int* arr) {
 
 void destructQueue(Queue* q) {
   if (q) {
-    free(q->arr);
     free(q);
     q = NULL;
   }
@@ -42,10 +41,14 @@ void enQueue(Queue* q, int x) {
 }
 
 int deQueue(Queue* q) {
-  if (q->length != 0) {
+  if (q->length != 0 && q->count != 0) {
     q->count--;
     int curr = q->arr[q->head];
-    q->head++;
+    if (q->head == q->length - 1) {
+      q->head = 0;
+    } else {
+      q->head++;
+    }
     return curr;
   }
   return -1;

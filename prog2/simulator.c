@@ -83,7 +83,7 @@ int main(void) {
   int timer = rand()%iters;
   // (randomly) set the index of item whose priority would increase
   int index = rand()%(len - 1);
-  // initializing the heap
+  // initializing the heap 
   Heap* h = initializeHeap(len - 1, 0, harray);
   
   // initializing the queue
@@ -93,13 +93,13 @@ int main(void) {
   int sumQ = 0;
   int sumPQ = 0;
   int processCount = 0;
-  // running the clock
+  // running the clock 
   for (int i = 0; i < iters; i++) {
     // perform wild event when time is right i.e. i==timer
     if (i == timer) {
       wildEvent(h, pMax, index);
     }
-    generateArrival(q, h, pMax);
+    generateArrival(q, h, pMax); 
     processQueue(q, h, &sumQ, &sumPQ, &processCount, r);
   }
 

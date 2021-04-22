@@ -42,12 +42,12 @@ Heap* initializeHeap(int len, int h_size, int* arr) {
 
 void destructHeap(Heap* h) {
   if (h) {
-    free(h->arr);
     free(h);
     h = NULL;
   }
 }
 
+// referenced chapter 6 in the book
 void heapify(Heap* h, int i) {
   int l = left(i);
   int r = right(i);
@@ -66,6 +66,7 @@ void heapify(Heap* h, int i) {
   }
 }
 
+// referenced chapter 6 in the book
 Heap* array_to_Heap(int* A, int len, int size) {
   size = len;
   Heap* new_heap = initializeHeap(len, size, A);
