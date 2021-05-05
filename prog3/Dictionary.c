@@ -12,7 +12,7 @@
 void create(dictionary *D, int n) {
   D->slots = n;
   D->size = 0;
-  D->hash_table = calloc(n, sizeof(node_t));
+  D->hash_table = (node_t*) calloc(n, sizeof(node_t));
   for (int i = 0; i < n; i++) {
     D->hash_table[i].value = NULL;
     D->hash_table[i].next = NULL;
@@ -22,44 +22,38 @@ void create(dictionary *D, int n) {
 }
 
 // inserts element e->key:e->value into the dictoinary
-// First, make sure that e->key does not exiest in *D yet
+// First, make sure that e->key does not exist in *D yet
 // If it does, return an error code of -1
 // Otherwise, update the size of *D, and return 0.
 
 int insert(dictionary* D, element* e) {
-  if (find(D, e->key) == NULL) {
-    node_t* new_node = malloc(sizeof(node_t));
-    new_node->prev = NULL;
-    new_node->next = NULL;
-    memcpy(new_node->key, e->key, 5); 
-    new_node->value = e->value;
+  node_t* new_node = (node_t*) malloc(sizeof(node_t));
+  new_node->prev = NULL;
+  new_node->next = NULL;
+  memcpy(new_node->key, e->key, 5); 
+  new_node->value = e->value;
 
-    int index = hash(e->key, D->slots);
-    node_t* head = malloc(sizeof(node_t));
-    head = D->hash_table[index].next;
-    while(head->next != NULL) {
-      head = head->next;
-    }
-    head->next = new_node;
-    new_node->prev = head;
-    D->size++;
-    return 0;
-  } else {
-    return -1;
+  int index = hash(e->key, D->slots);
+  node_t* head = &(D->hash_table[index]);
+  while(head->next != NULL) {
+    head = head->next;
   }
+  head->next = new_node;
+  new_node->prev = head;
+  D->size++;
+  return 0;
 }
 
 node_t* find(dictionary* D, char* k) {
   int index = hash(k, D->slots);
-  node_t* temp = malloc(sizeof(node_t));
-  temp = D->hash_table[index].next;
-  while(temp != NULL) {
-    if(strcmp(temp->key, k) == 0) {
-      return temp;
-    } else {
-      temp = temp->next;
+  node_t* head = &(D->hash_table[index]); // set head equal to the address of the sentinel node at the hash table index
+  while(head->next != NULL) {		// start at head->next so that we skip the sentinel node
+    if(strncmp(head->next->key, k, 5) == 0) {
+      return head->next;
     }
+    head = head->next; 
   }
+  printf("No %s in the index %d\n", k, index);
   return NULL;
 }
 

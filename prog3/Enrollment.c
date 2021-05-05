@@ -5,14 +5,12 @@
 #include "Dictionary.h"
 #include "Enrollment.h"
 // create global dictionaries
-dictionary CourseDict;
-dictionary StudentDict;
 
 int main() {
-  create(&CourseDict, 20);
-  element* new_element = malloc(sizeof(element));
-  scanf("%s", new_element->key);
-  insert(&CourseDict, new_element);
-  printf("%s", find(&CourseDict, "12345")->key);
+  dictionary* CourseDict = malloc(sizeof(dictionary));
+  create(CourseDict, 20);
+  element* el = malloc(sizeof(element));
+  scanf("%s", el->key);
+  insert(CourseDict, el);
   return 0;
 }
