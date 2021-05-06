@@ -34,8 +34,10 @@ int insert(dictionary* D, element* e) {
   new_node->value = e->value;
 
   int index = hash(e->key, D->slots);
+  printf("%d\n", index);
   node_t* head = &(D->hash_table[index]);
   while(head->next != NULL) {
+    printf("%s\n", head->key);
     head = head->next;
   }
   head->next = new_node;
