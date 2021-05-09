@@ -10,6 +10,7 @@
 // creates a dictionary with n slots
 // Initializes slots to n, and size to 0.
 void create(dictionary *D, int n) {
+  D = (dictionary*) malloc(sizeof(dictionary));
   D->slots = n;
   D->size = 0;
   D->hash_table = (node_t*) calloc(n, sizeof(node_t));
@@ -34,16 +35,31 @@ int insert(dictionary* D, element* e) {
   new_node->value = e->value;
 
   int index = hash(e->key, D->slots);
-  printf("%d\n", index);
   node_t* head = &(D->hash_table[index]);
   while(head->next != NULL) {
-    printf("%s\n", head->key);
     head = head->next;
   }
   head->next = new_node;
   new_node->prev = head;
   D->size++;
   return 0;
+}
+
+int delete(dictionary* D, char* key) {
+  if (find(D, key) == NULL) {
+    return -1;
+  }
+  int index = hash(key, D->slots);
+  node_t* head = &(D->hash_table[index]);
+  while(strncmp(head->next->key, key, 5) != 0) {
+    head = head->next;
+  }
+  head->prev->next = head->next;
+  if (head->next != NULL) {
+    head->next->prev = head->prev;
+  }
+  D->size--;
+  return 0; 
 }
 
 node_t* find(dictionary* D, char* k) {
@@ -60,13 +76,12 @@ node_t* find(dictionary* D, char* k) {
 }
 
 void print(dictionary* D) {
-  node_t* ptr = malloc(sizeof(node_t));
   for (int i = 0; i < D->slots; i++) {
-    if (strcmp(D->hash_table[i].next->key, "     ") != 0) {
-      ptr = D->hash_table[i].next;
-      while (ptr != NULL) {
-   	printf("%s ", ptr->key);
-	ptr = ptr->next;
+    if (strncmp(D->hash_table[i].next->key, "     ", 5) != 0) {
+      node_t* head = D->hash_table[i].next;
+      while (head->next != NULL) {
+   	printf("%s ", head->next->key);
+	head = head->next;
       }
     }
   }
