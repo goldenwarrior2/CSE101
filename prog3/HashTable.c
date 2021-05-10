@@ -10,7 +10,7 @@
 
 int convert(char key[5]) {
   int value;
-  int sum;
+  int sum = 0;
   for (int i = 0; i < 5; i++) {
     value = key[i];
     sum += value;

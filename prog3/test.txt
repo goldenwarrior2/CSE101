@@ -1,0 +1,17 @@
+ac CS101 10
+ac CS160 5
+en 12345 CS101 student_1
+ac EE123 5
+en 23456 CS101 student_2
+en 23456 EE123 student_2
+en 23456 CS160 student_2
+pc	
+en 12345 CS160 student_1
+en 34567 CS160 student_3
+en 45678 CS160 student_4
+dc EE123 x
+dr 34567 CS160 student_3
+en 34567 EE123 student_3
+pc	
+ps	
+ex	

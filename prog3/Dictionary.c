@@ -10,7 +10,7 @@
 // creates a dictionary with n slots
 // Initializes slots to n, and size to 0.
 void create(dictionary *D, int n) {
-  D = (dictionary*) malloc(sizeof(dictionary));
+  *D = *((dictionary*) malloc(sizeof(dictionary)));
   D->slots = n;
   D->size = 0;
   D->hash_table = (node_t*) calloc(n, sizeof(node_t));
@@ -71,7 +71,6 @@ node_t* find(dictionary* D, char* k) {
     }
     head = head->next; 
   }
-  printf("No %s in the index %d\n", k, index);
   return NULL;
 }
 
