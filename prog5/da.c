@@ -4,14 +4,15 @@
 #include"graph.h"
 
 int main(void) {
-  graph g = createGraph(4);
-  addEdge(g, 1, 1);
-  printf("%d\n", hasEdge(g, 1, 1));
+  node* list = createList(0);
+  graph g = createGraph(10);
+  addEdge(g, 1, 2);
+  addEdge(g, 2, 2);
+  addEdge(g, 3, 2);
+  addEdge(g, 4, 2);
+  inEdges(g, 2, &list);
+  printList(list);
   printGraph(g);
-  printf("\n");
-  removeEdge(g, 1, 1);
-  printf("%d\n", hasEdge(g, 1, 1));
-  printGraph(g);
-  
+  destructGraph(g);
   return 0;
 }
